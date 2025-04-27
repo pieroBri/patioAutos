@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import React from "react";
 import { io } from "socket.io-client";
 
 const socket = io('http://localhost:4000', {autoConnect: false});
@@ -25,6 +26,7 @@ export const AdminComponent = ({ flag }) => {
                     <div>
                         <h1>{rutUsuario} </h1>
                         <p>This is the admin component.</p>
+                        <FileUploadComponent />
                     </div>
                 );
             }
@@ -70,6 +72,24 @@ function LoginManager({ cambioDeFlag, flag}) {
         );
     }
 }
+
+
+export const FileUploadComponent = () => {
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            console.log("Archivo seleccionado:", file.name);
+            // Aquí puedes manejar el archivo, como enviarlo a un servidor
+        }
+    };
+
+    return (
+        <div>
+            <h2>Subir Archivo</h2>
+            <input type="file" onChange={handleFileUpload} />
+        </div>
+    );
+};
 
 export default LoginManager;
 // export default App;
