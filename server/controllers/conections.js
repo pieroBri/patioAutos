@@ -15,5 +15,26 @@ const listadoRuts = {
     '20479124-4': { nombre: 'Piero'},
 };
 
+const reservas = [];
 
-// crea un objeto para almacenar los mensajes
+
+function manejoReservas(socket, io) {
+    socket.on('agregarReserva', (data) => {
+        //console.log('agregarAuto', data);
+        
+        const nuevaReserva = {
+            hora: data.hora,
+            patente: data.patente,
+            obs: data.obs,
+        };
+
+        reservas.push(nuevaReserva);
+        io.emit('updateListaReservas', reservas);
+    });
+    
+    socket.on('obtenerReservas', () => {
+        socket.emit('listaReservas', reservas);
+    });
+}
+
+module.exports = manejoReservas;

@@ -7,12 +7,40 @@ const socket = io('http://localhost:4000', {autoConnect: false});
 const listadoRuts = {
     '20251778-1': { nombre: 'Seba', cargo: '0'},
     '20479124-4': { nombre: 'Piero', cargo: '1'},
+    '12345678-9': { nombre: 'Juan', cargo: '1' },
 };
 
 export const AdminComponent = ({ flag }) => {
     const rutUsuario = window.localStorage.getItem('rutUsuario');
     const [listaAutos, setListaAutos] = useState([]);
 
+    useEffect(() => {
+        if (flag) {
+             // Solicitar las reservas al servidor
+             socket.emit('obtenerReservas');
+
+             // Escuchar la respuesta del servidor con las reservas
+             socket.on('listaReservas', (reservas) => {
+                 console.log('Reservas recibidas:', reservas);
+                 setListaAutos(reservas);
+             });
+ 
+             // Escuchar actualizaciones en tiempo real de las reservas
+             socket.on('updateListaReservas', (reservas) => {
+                 setListaAutos(reservas);
+             });
+ 
+             return () => {
+                 socket.off('listaReservas');
+                 socket.off('updateListaReservas');
+             };
+        }
+        
+    }, [flag]);
+
+    // socket.on('updateListaReservas', (reservas) => {
+    //     setListaAutos(reservas);
+    // });
     function agregarAuto() {
         console.log('agregarAuto');
         const hora = document.getElementById('hora').value;
@@ -23,10 +51,12 @@ export const AdminComponent = ({ flag }) => {
         console.log('patente', patente);
         console.log('obs', obs);
 
-        setListaAutos((prevAutos) => [
-            ...prevAutos,
-            { hora, patente, obs },
-        ]);
+        // setListaAutos((prevAutos) => [
+        //     ...prevAutos,
+        //     { hora, patente, obs },
+        // ]);
+
+        socket.emit('agregarReserva', { hora, patente, obs });
 
     }
 
@@ -36,7 +66,7 @@ export const AdminComponent = ({ flag }) => {
                 return (
                     <div>
                         <h1>{rutUsuario} </h1>
-                        <div>
+                        <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid black', padding: '10px' }}>
                             {listaAutos.map((auto, index) => (
                                 <div key={index}>
                                     <p>Hora: {auto.hora}</p>
@@ -50,17 +80,17 @@ export const AdminComponent = ({ flag }) => {
             }
             if (listadoRuts[rutUsuario].cargo === '1') {        
                 return (
-                    <div>
+                    <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid black', padding: '10px' }}>
+                        <h1>{listadoRuts[rutUsuario].nombre} </h1>
                         <div>
-                            <h1>{listadoRuts[rutUsuario].nombre} </h1>
                             <input type="text" id="hora" placeholder="Hora" />
                             <input type="text" id="patente" placeholder="Patente" />
                             <input type="text" id="obs" placeholder="Observación"/>
                             <button onClick={agregarAuto}>Agregar Auto</button>
                             <p>This is the admin component.</p>
-                        <FileUploadComponent />
+                        {/* <FileUploadComponent /> */}
                         </div>
-                        <div>
+                        <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid black', padding: '10px' }}>
                             {listaAutos.map((auto, index) => (
                                 <div key={index}>
                                     <p>Hora: {auto.hora}</p>

@@ -5,6 +5,8 @@ const PORT = 4000;
 const http = require('http').Server(app);
 const cors = require('cors');
 
+const manejoReservas = require('./controllers/conections');
+
 app.use(cors());
 
 const io = require('socket.io')(http, {
@@ -15,6 +17,7 @@ const io = require('socket.io')(http, {
 
 io.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
+    manejoReservas(socket, io);
     socket.on('disconnect', () => {
       console.log('🔥: A user disconnected');
     });
