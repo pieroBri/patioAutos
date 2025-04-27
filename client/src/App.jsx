@@ -1,14 +1,20 @@
-import { io } from 'socket.io-client';
+import { useState} from 'react';
+import LoginManager, {AdminComponent} from './components/mainComponent';
 
-const socket = io('http://localhost:4000', {autoConnect: false});
+//const socket = io('http://localhost:4000');
 function App() {
+  
+  const [flagLobby, setFlagLobby] = useState(false);
 
+  function cambioDeFlag(value) {
+      setFlagLobby(value);
+      console.log('valor de la flag es: ', flagLobby);
+  }
   return (
     <div className='App'>
-      <h2>Hola Probando react</h2>
-      <button onClick={ () => { socket.connect()}}>Conectar</button>
+      <LoginManager cambioDeFlag={cambioDeFlag} flag={flagLobby} />
+      <AdminComponent flag={flagLobby} />
     </div>
-    
   );
 }
 

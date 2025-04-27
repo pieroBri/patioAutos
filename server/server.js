@@ -18,6 +18,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       console.log('🔥: A user disconnected');
     });
+    socket.on('ingreso', (usuario) => {
+        console.log(usuario);
+    });
 });
 
 app.get('/api', (req, res) => {
