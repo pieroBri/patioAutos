@@ -11,22 +11,65 @@ const listadoRuts = {
 
 export const AdminComponent = ({ flag }) => {
     const rutUsuario = window.localStorage.getItem('rutUsuario');
+    const [listaAutos, setListaAutos] = useState([]);
+
+    function agregarAuto() {
+        console.log('agregarAuto');
+        const hora = document.getElementById('hora').value;
+        const patente = document.getElementById('patente').value;   
+        const obs = document.getElementById('obs').value;
+
+        console.log('hora', hora);
+        console.log('patente', patente);
+        console.log('obs', obs);
+
+        setListaAutos((prevAutos) => [
+            ...prevAutos,
+            { hora, patente, obs },
+        ]);
+
+    }
+
     if (flag) {
         if (rutUsuario in listadoRuts) {
             if (listadoRuts[rutUsuario].cargo === '0') {
                 return (
                     <div>
                         <h1>{rutUsuario} </h1>
-                        <p>This is the user component.</p>
+                        <div>
+                            {listaAutos.map((auto, index) => (
+                                <div key={index}>
+                                    <p>Hora: {auto.hora}</p>
+                                    <p>Patente: {auto.patente}</p>
+                                    <p>Observación: {auto.obs}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 );
             }
             if (listadoRuts[rutUsuario].cargo === '1') {        
                 return (
                     <div>
-                        <h1>{rutUsuario} </h1>
-                        <p>This is the admin component.</p>
+                        <div>
+                            <h1>{listadoRuts[rutUsuario].nombre} </h1>
+                            <input type="text" id="hora" placeholder="Hora" />
+                            <input type="text" id="patente" placeholder="Patente" />
+                            <input type="text" id="obs" placeholder="Observación"/>
+                            <button onClick={agregarAuto}>Agregar Auto</button>
+                            <p>This is the admin component.</p>
                         <FileUploadComponent />
+                        </div>
+                        <div>
+                            {listaAutos.map((auto, index) => (
+                                <div key={index}>
+                                    <p>Hora: {auto.hora}</p>
+                                    <p>Patente: {auto.patente}</p>
+                                    <p>Observación: {auto.obs}</p>
+                                </div>
+                            ))}
+                        </div>
+                        
                     </div>
                 );
             }
