@@ -1,8 +1,10 @@
 import { useState} from 'react';
+import React from 'react';
+import { PrimeReactProvider } from 'primereact/api';
 import LoginManager, {AdminComponent} from './components/mainComponent';
 
 //const socket = io('http://localhost:4000');
-function App() {
+const App = () => {
   
   const [flagLobby, setFlagLobby] = useState(false);
 
@@ -12,8 +14,10 @@ function App() {
   }
   return (
     <div className='App'>
-      <LoginManager cambioDeFlag={cambioDeFlag} flag={flagLobby} />
-      <AdminComponent flag={flagLobby} />
+      <PrimeReactProvider>
+        <LoginManager cambioDeFlag={cambioDeFlag} flag={flagLobby} />
+        <AdminComponent flag={flagLobby} />
+      </PrimeReactProvider>
     </div>
   );
 }

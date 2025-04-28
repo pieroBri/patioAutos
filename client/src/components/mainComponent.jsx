@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import { io } from "socket.io-client";
+import { Button } from 'primereact/Button';
+import { InputText } from "primereact/inputtext";
+import { Card } from "primereact/Card";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import Papa from "papaparse";
 
 const socket = io('http://localhost:4000', {autoConnect: false});
 
@@ -45,7 +51,7 @@ export const AdminComponent = ({ flag }) => {
         console.log('agregarAuto');
         const hora = document.getElementById('hora').value;
         const patente = document.getElementById('patente').value;   
-        const obs = document.getElementById('obs').value;
+        const obs = '';
 
         console.log('hora', hora);
         console.log('patente', patente);
@@ -80,25 +86,110 @@ export const AdminComponent = ({ flag }) => {
             }
             if (listadoRuts[rutUsuario].cargo === '1') {        
                 return (
-                    <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid black', padding: '10px' }}>
-                        <h1>{listadoRuts[rutUsuario].nombre} </h1>
-                        <div>
-                            <input type="text" id="hora" placeholder="Hora" />
-                            <input type="text" id="patente" placeholder="Patente" />
-                            <input type="text" id="obs" placeholder="Observación"/>
-                            <button onClick={agregarAuto}>Agregar Auto</button>
-                            <p>This is the admin component.</p>
-                        {/* <FileUploadComponent /> */}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid black', padding: '10px' }}>
-                            {listaAutos.map((auto, index) => (
-                                <div key={index}>
-                                    <p>Hora: {auto.hora}</p>
-                                    <p>Patente: {auto.patente}</p>
-                                    <p>Observación: {auto.obs}</p>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="flex justify-content-center align-items-center min-h-screen bg-black">
+                        <Card
+                            className="w-11 md:w-8 lg:w-6 border-1 border-round-xl border-white-alpha-20"
+                            style={{ background: "rgba(0,0,0,0.8)" }}
+                        >
+                            <h1>{listadoRuts[rutUsuario].nombre} </h1>
+                            {/* Form Section */}
+
+                            <div className="flex flex-column md:flex-row gap-3 mb-4 justify-content-center">
+                                <span className="p-input-icon-left w-full md:w-4">
+                                    <i className="pi pi-clock px-1" />
+                                    <InputText
+                                    id="hora"
+                                    placeholder="Hora"
+                                    className="w-full p-inputtext-sm surface-900 text-white border-1 border-blue-400 px-4"/>
+                                </span>
+                                <span className="p-input-icon-left w-full md:w-4">
+                                    <i className="pi pi-id-card px-1" />
+                                    <InputText
+                                    id="patente"
+                                    placeholder="Patente"
+                                    className="w-full p-inputtext-sm surface-900 text-white border-1 border-blue-400 px-4"
+                                    />
+                                </span>
+                                <Button
+                                    label="Agregar"
+                                    icon="pi pi-plus"
+                                    onClick={agregarAuto}
+                                    className="p-button-sm w-full md:w-2 border-1 border-yellow-400"
+                                    style={{ background: "rgba(204, 204, 44)" }}
+                                />
+                                <FileUploadComponent />
+                            </div>
+
+                            {/* Table Section */}
+                            <div className="mt-4">
+                            <DataTable
+                                value={listaAutos}
+                                showGridlines
+                                stripedRows
+                                className="text-white"
+                                style={{
+                                background: "rgba(30, 30, 30, 0.7)",
+                                borderRadius: "8px",
+                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                }}
+                            >
+                                <Column
+                                field="hora"
+                                header="Hora"
+                                style={{
+                                    borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+                                    background: "rgba(20, 20, 20, 0.7)",
+                                }}
+                                headerStyle={{
+                                    background: "rgba(0, 100, 200, 0.3)",
+                                    color: "white",
+                                }}
+                                />
+                                <Column
+                                field="patente"
+                                header="Patente"
+                                style={{
+                                    borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+                                    background: "rgba(20, 20, 20, 0.7)",
+                                }}
+                                headerStyle={{
+                                    background: "rgba(0, 100, 200, 0.3)",
+                                    color: "white",
+                                }}
+                                />
+                                <Column
+                                field="observacion"
+                                header="Observacion"
+                                style={{
+                                    borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+                                    background: "rgba(20, 20, 20, 0.7)",
+                                }}
+                                headerStyle={{
+                                    background: "rgba(0, 100, 200, 0.3)",
+                                    color: "white",
+                                }}
+                                />
+                                <Column
+                                field="estado"
+                                header="Estado"
+                                style={{
+                                    background: "rgba(20, 20, 20, 0.7)",
+                                }}
+                                headerStyle={{
+                                    background: "rgba(0, 100, 200, 0.3)",
+                                    color: "white",
+                                }}
+                                />
+                            </DataTable>
+                                {/* {listaAutos.map((auto, index) => (
+                                    <div key={index}>
+                                        <p>Hora: {auto.hora}</p>
+                                        <p>Patente: {auto.patente}</p>
+                                        <p>Observación: {auto.obs}</p>
+                                    </div>
+                                ))} */}
+                            </div>
+                        </Card>
                         
                     </div>
                 );
@@ -133,14 +224,17 @@ function LoginManager({ cambioDeFlag, flag}) {
     }
     if (flag === false) {
         return (
-            <div className='App'>
-              <input
-                type="text"
-                placeholder='Rut Usuario'
-                value={rutUsuario}
-                onChange={(e) => setRutUsuario(e.target.value)}
-                />
-              <button onClick={conectarSocket}>Enviar</button>
+            <div className="flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+                <div className="p-inputgroup" style={{ maxWidth: "500px" }}>
+                    <InputText
+                        className="p-inputtext-lg"
+                        type="text"
+                        placeholder='Rut Usuario'
+                        value={rutUsuario}
+                        onChange={(e) => setRutUsuario(e.target.value)}
+                        />
+                    <Button label="Enter" className="p-button-primary p-button-lg" onClick={conectarSocket}></Button>
+                </div>
             </div>
         );
     }
@@ -151,8 +245,36 @@ export const FileUploadComponent = () => {
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            console.log("Archivo seleccionado:", file.name);
-            // Aquí puedes manejar el archivo, como enviarlo a un servidor
+            if (file.type === "text/csv") {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const csvData = e.target.result;
+                    Papa.parse(csvData, {
+                        header: true, // Si el archivo tiene encabezados
+                        skipEmptyLines: true,
+                        complete: (result) => {
+                            console.log("Datos del CSV:", result.data[1]["Categor�a"]);
+                            // Aquí puedes operar con los datos del CSV
+                            result.data.forEach((fila) => {
+                                let reserva = {
+                                    hora: fila["Suc. Salida"],
+                                    patente: fila["Patente"],
+                                    obs: '',
+                                }
+                                socket.emit('agregarReserva', reserva);
+                                console.log('reserva', reserva);
+                            });
+
+                        },
+                        error: (error) => {
+                            console.error("Error al leer el archivo CSV:", error);
+                        },
+                    });
+                };
+                reader.readAsText(file);
+            } else {
+                console.error("Por favor, sube un archivo .csv");
+            }
         }
     };
 
