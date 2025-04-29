@@ -6,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { Card } from "primereact/Card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+
 import Papa from "papaparse";
 
 const socket = io('http://localhost:4000', {autoConnect: false});
@@ -51,19 +52,37 @@ export const AdminComponent = ({ flag }) => {
         console.log('agregarAuto');
         const hora = document.getElementById('hora').value;
         const patente = document.getElementById('patente').value;   
-        const obs = '';
 
         console.log('hora', hora);
         console.log('patente', patente);
-        console.log('obs', obs);
 
         // setListaAutos((prevAutos) => [
         //     ...prevAutos,
         //     { hora, patente, obs },
         // ]);
 
-        socket.emit('agregarReserva', { hora, patente, obs });
+        socket.emit('agregarReserva', { hora, patente });
 
+    }
+
+    const editarEstado = (e) => {
+        const id_auto = e.target.parentElement.id;  
+        const estado = e.target.value;
+
+        console.log('id', id_auto);
+        console.log('estado', estado);
+
+        socket.emit('editarEstadoReserva', { index: id_auto, estado: estado });
+    }
+    
+    const editarObservación = (e) => {
+        const id_auto = e.target.parentElement.parentElement.id;  
+        const obs = e.target.value;
+
+        console.log('id', id_auto);
+        console.log('obs', obs);
+
+        socket.emit('editarObsReserva', { index: id_auto, obs: obs });
     }
 
     if (flag) {
@@ -72,15 +91,19 @@ export const AdminComponent = ({ flag }) => {
                 return (
                     <div>
                         <h1>{rutUsuario} </h1>
-                        <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid black', padding: '10px' }}>
-                            {listaAutos.map((auto, index) => (
-                                <div key={index}>
-                                    <p>Hora: {auto.hora}</p>
-                                    <p>Patente: {auto.patente}</p>
-                                    <p>Observación: {auto.obs}</p>
-                                </div>
-                            ))}
-                        </div>
+                        
+                        {listaAutos.map((auto, index) => (
+                            <div key={index} id={index} className="flex p-3 gap-2 border-1 border-round-xl border-white-alpha-20">
+                                <p className="p-2">Hora: {auto.hora}</p>
+                                <p className="p-2">Patente: {auto.patente}</p>
+                                <p className="p-2">Observación: <InputText value={auto.obs} onChange={editarObservación} /></p>
+                                <select name="estado" defaultValue={auto.estado} onChange={editarEstado} className="border-1 border-blue-400 px-2">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="En preparación">En preparación</option>
+                                    <option value="Disponible">Disponible</option>
+                                </select>
+                            </div>
+                        ))}
                     </div>
                 );
             }
@@ -158,7 +181,7 @@ export const AdminComponent = ({ flag }) => {
                                 }}
                                 />
                                 <Column
-                                field="observacion"
+                                field="obs"
                                 header="Observacion"
                                 style={{
                                     borderRight: "1px solid rgba(255, 255, 255, 0.2)",

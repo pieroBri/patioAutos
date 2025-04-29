@@ -17,15 +17,22 @@ const listadoRuts = {
 
 const reservas = [];
 
+const obs = {
+    emisor: '',
+    mensaje: '',
+};
 
 function manejoReservas(socket, io) {
     socket.on('agregarReserva', (data) => {
         //console.log('agregarAuto', data);
+
+
         
         const nuevaReserva = {
             hora: data.hora,
             patente: data.patente,
-            obs: data.obs,
+            obs: [],
+            estado: 'Pendiente',
         };
 
         reservas.push(nuevaReserva);
@@ -34,6 +41,24 @@ function manejoReservas(socket, io) {
     
     socket.on('obtenerReservas', () => {
         socket.emit('listaReservas', reservas);
+    });
+
+    socket.on('editarEstadoReserva', (data) => {
+        //console.log('editarestadoReserva', data);
+        const { index, estado } = data;
+        if (reservas[index]) {
+            reservas[index].estado = estado;
+            io.emit('updateListaReservas', reservas);
+        }
+    });
+
+    socket.on('editarObsReserva', (data) => {
+        const { index, obs } = data;
+        console.log('editarObsReserva', data);
+        if (reservas[index]) {
+            reservas[index].obs = obs;
+            io.emit('updateListaReservas', reservas);
+        }
     });
 }
 
