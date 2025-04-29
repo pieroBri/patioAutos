@@ -19,6 +19,7 @@ const listadoRuts = {
 
 export const AdminComponent = ({ flag }) => {
     const rutUsuario = window.localStorage.getItem('rutUsuario');
+    const [observacion, setObservacion] = useState(''); // Estado para la observación
     const [listaAutos, setListaAutos] = useState([]);
 
     useEffect(() => {
@@ -75,14 +76,10 @@ export const AdminComponent = ({ flag }) => {
         socket.emit('editarEstadoReserva', { index: id_auto, estado: estado });
     }
     
-    const editarObservación = (e) => {
-        const id_auto = e.target.parentElement.parentElement.id;  
-        const obs = e.target.value;
-
-        console.log('id', id_auto);
-        console.log('obs', obs);
-
-        socket.emit('editarObsReserva', { index: id_auto, obs: obs });
+    const agregarObservación = (patente) => {
+        console.log('agregarObservacion', patente, observacion);
+        socket.emit('agregarObservacion', { patente: patente, emisor: rutUsuario, mensaje: observacion });
+        setObservacion('');
     }
 
     if (flag) {
@@ -96,7 +93,17 @@ export const AdminComponent = ({ flag }) => {
                             <div key={index} id={index} className="flex p-3 gap-2 border-1 border-round-xl border-white-alpha-20">
                                 <p className="p-2">Hora: {auto.hora}</p>
                                 <p className="p-2">Patente: {auto.patente}</p>
-                                <p className="p-2">Observación: <InputText value={auto.obs} onChange={editarObservación} /></p>
+                                <div className="p-3 bg-yellow">
+                                    <InputText
+                                        className="p-inputtext-lg"
+                                        type="text"
+                                        placeholder='Observacion'
+                                        value={observacion}
+                                        onChange={(e) => setObservacion(e.target.value)}
+                                    />
+                                    <Button label="submit" className="p-button-warning p-button-lg" onClick={() => agregarObservación(auto.patente)}></Button>
+                                </div>
+                                {/* <p className="p-2">Observación: <InputText value={auto.obs} onChange={editarObservación} /></p> */}
                                 <select name="estado" defaultValue={auto.estado} onChange={editarEstado} className="border-1 border-blue-400 px-2">
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="En preparación">En preparación</option>

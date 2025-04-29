@@ -31,7 +31,7 @@ function manejoReservas(socket, io) {
         const nuevaReserva = {
             hora: data.hora,
             patente: data.patente,
-            obs: [],
+            observaciones: [],
             estado: 'Pendiente',
         };
 
@@ -52,14 +52,28 @@ function manejoReservas(socket, io) {
         }
     });
 
-    socket.on('editarObsReserva', (data) => {
-        const { index, obs } = data;
-        console.log('editarObsReserva', data);
-        if (reservas[index]) {
-            reservas[index].obs = obs;
-            io.emit('updateListaReservas', reservas);
+    socket.on('agregarObservacion', (data) => {
+        const observacion = {
+            emisor: data.emisor,
+            mensaje: data.mensaje,
+        };
+        console.log('---------------agregarObservacion', data);
+        //const { patente, observacion } = data;
+        const reserva = reservas.find((r) => r.patente === data.patente);
+        if (reserva) {
+            reserva.obs.concat(observacion); // Agregar observación al array
+            io.emit('observacionAgregada', { patente, observacion }); // Notificar al cliente
         }
     });
+
+    // socket.on('editarObsReserva', (data) => {
+    //     const { index, obs } = data;
+    //     console.log('editarObsReserva', data);
+    //     if (reservas[index]) {
+    //         reservas[index].obs = obs;
+    //         io.emit('updateListaReservas', reservas);
+    //     }
+    // });
 }
 
 module.exports = manejoReservas;
