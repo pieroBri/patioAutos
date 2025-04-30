@@ -7,6 +7,7 @@ import { Card } from "primereact/card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ReservaCSV } from "../interfaces/archivos"
+import { InputTextarea } from "primereact/inputtextarea";
 
 import Papa from "papaparse";
 
@@ -48,6 +49,10 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
  
              // Escuchar actualizaciones en tiempo real de las reservas
              socket.on('updateListaReservas', (reservas: Reserva[]) => {
+                setListaReservaDeAutos(reservas);
+             });
+
+             socket.on('observacionAgregada', (reservas: Reserva[]) => {
                 setListaReservaDeAutos(reservas);
              });
  
@@ -106,12 +111,18 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                             <div key={index} id={index.toString()} className="flex p-3 gap-2 border-1 border-round-xl border-white-alpha-20">
                                 <p className="p-2">Hora: {auto.hora}</p>
                                 <p className="p-2">Patente: {auto.patente}</p>
+                                <p className="p-2">Observaciones: </p>
+                                <InputTextarea
+                                    className="p-inputtext-lg"
+                                    placeholder='Observacion'
+                                    value={auto.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
+                                    readOnly rows={5} cols={30}/>
                                 <div className="p-3 bg-yellow">
                                     <InputText
                                         className="p-inputtext-lg"
                                         type="text"
                                         placeholder='Observacion'
-                                        value={observacion}
+                                        defaultValue=''
                                         onChange={(e) => setObservacion(e.target.value)}
                                     />
                                     <Button label="submit" className="p-button-warning p-button-lg" onClick={() => agregarObservación(auto.patente)}></Button>

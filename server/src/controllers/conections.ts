@@ -67,7 +67,7 @@ function manejoReservas(socket: Socket, io: Server) {
         const reserva = reservas.find((r) => r.patente === data.patente);
         if (reserva) {
             reserva.observaciones.push(nuevaObservacion); // Agregar observación al array
-            io.emit('observacionAgregada', { patente: data.patente, nuevaObservacion}); // Notificar al cliente
+            io.emit('observacionAgregada', reservas); // Notificar al cliente
         }
     });
 
