@@ -8,10 +8,11 @@ const App = () => {
   
   const [flagLobby, setFlagLobby] = useState(false);
 
-  function cambioDeFlag(value) {
+  function cambioDeFlag(value: boolean) {
       setFlagLobby(value);
       console.log('valor de la flag es: ', flagLobby);
-  }
+  };
+
   return (
     <div className='App'>
       <PrimeReactProvider>

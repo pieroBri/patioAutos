@@ -1,26 +1,39 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import { io } from "socket.io-client";
-import { Button } from 'primereact/Button';
+import { Button } from 'primereact/button';
 import { InputText } from "primereact/inputtext";
-import { Card } from "primereact/Card";
+import { Card } from "primereact/card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { ReservaCSV } from "../interfaces/archivos"
 
 import Papa from "papaparse";
 
+interface Observacion {
+    emisor: string;
+    mensaje: string;
+}
+
+interface Reserva {
+    hora: string;
+    patente: string;
+    observaciones: Observacion[];
+    estado: string;
+}
+
 const socket = io('http://localhost:4000', {autoConnect: false});
 
-const listadoRuts = {
-    '20251778-1': { nombre: 'Seba', cargo: '0'},
-    '20479124-4': { nombre: 'Piero', cargo: '1'},
+const listadoRuts: Record<string, { nombre: string; cargo: string }> = {
+    '20251778-1': { nombre: 'Seba', cargo: '0' },
+    '20479124-4': { nombre: 'Piero', cargo: '1' },
     '12345678-9': { nombre: 'Juan', cargo: '1' },
 };
 
-export const AdminComponent = ({ flag }) => {
-    const rutUsuario = window.localStorage.getItem('rutUsuario');
-    const [observacion, setObservacion] = useState(''); // Estado para la observación
-    const [listaAutos, setListaAutos] = useState([]);
+export const AdminComponent = ({ flag }: { flag: boolean }) => {
+    const rutUsuario = window.localStorage.getItem('rutUsuario') ?? '';
+    const [observacion, setObservacion] = useState<string>(''); // Estado para la observación
+    const [listaReservaDeAutos, setListaReservaDeAutos] = useState<Reserva[]>([]); // Estado para la lista de reservas con interfaz
 
     useEffect(() => {
         if (flag) {
@@ -28,14 +41,14 @@ export const AdminComponent = ({ flag }) => {
              socket.emit('obtenerReservas');
 
              // Escuchar la respuesta del servidor con las reservas
-             socket.on('listaReservas', (reservas) => {
+             socket.on('listaReservas', (reservas: Reserva[]) => {
                  console.log('Reservas recibidas:', reservas);
-                 setListaAutos(reservas);
+                 setListaReservaDeAutos(reservas);
              });
  
              // Escuchar actualizaciones en tiempo real de las reservas
-             socket.on('updateListaReservas', (reservas) => {
-                 setListaAutos(reservas);
+             socket.on('updateListaReservas', (reservas: Reserva[]) => {
+                setListaReservaDeAutos(reservas);
              });
  
              return () => {
@@ -51,8 +64,8 @@ export const AdminComponent = ({ flag }) => {
     // });
     function agregarAuto() {
         console.log('agregarAuto');
-        const hora = document.getElementById('hora').value;
-        const patente = document.getElementById('patente').value;   
+        const hora = (document.getElementById("hora") as HTMLInputElement).value;
+        const patente = (document.getElementById("patente") as HTMLInputElement).value;
 
         console.log('hora', hora);
         console.log('patente', patente);
@@ -66,8 +79,8 @@ export const AdminComponent = ({ flag }) => {
 
     }
 
-    const editarEstado = (e) => {
-        const id_auto = e.target.parentElement.id;  
+    const editarEstado = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const id_auto = e.target.parentElement?.id || ""; 
         const estado = e.target.value;
 
         console.log('id', id_auto);
@@ -76,7 +89,7 @@ export const AdminComponent = ({ flag }) => {
         socket.emit('editarEstadoReserva', { index: id_auto, estado: estado });
     }
     
-    const agregarObservación = (patente) => {
+    const agregarObservación = (patente: string) => {
         console.log('agregarObservacion', patente, observacion);
         socket.emit('agregarObservacion', { patente: patente, emisor: rutUsuario, mensaje: observacion });
         setObservacion('');
@@ -89,8 +102,8 @@ export const AdminComponent = ({ flag }) => {
                     <div>
                         <h1>{rutUsuario} </h1>
                         
-                        {listaAutos.map((auto, index) => (
-                            <div key={index} id={index} className="flex p-3 gap-2 border-1 border-round-xl border-white-alpha-20">
+                        {listaReservaDeAutos.map((auto, index) => (
+                            <div key={index} id={index.toString()} className="flex p-3 gap-2 border-1 border-round-xl border-white-alpha-20">
                                 <p className="p-2">Hora: {auto.hora}</p>
                                 <p className="p-2">Patente: {auto.patente}</p>
                                 <div className="p-3 bg-yellow">
@@ -104,7 +117,11 @@ export const AdminComponent = ({ flag }) => {
                                     <Button label="submit" className="p-button-warning p-button-lg" onClick={() => agregarObservación(auto.patente)}></Button>
                                 </div>
                                 {/* <p className="p-2">Observación: <InputText value={auto.obs} onChange={editarObservación} /></p> */}
-                                <select name="estado" defaultValue={auto.estado} onChange={editarEstado} className="border-1 border-blue-400 px-2">
+                                <select 
+                                    name="estado" 
+                                    defaultValue={auto.estado || "Pendiente"} 
+                                    onChange={editarEstado} className="border-1 border-blue-400 px-2"
+                                >
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="En preparación">En preparación</option>
                                     <option value="Disponible">Disponible</option>
@@ -153,7 +170,7 @@ export const AdminComponent = ({ flag }) => {
                             {/* Table Section */}
                             <div className="mt-4">
                             <DataTable
-                                value={listaAutos}
+                                value={listaReservaDeAutos}
                                 showGridlines
                                 stripedRows
                                 className="text-white"
@@ -228,7 +245,7 @@ export const AdminComponent = ({ flag }) => {
     }
 }
 
-function LoginManager({ cambioDeFlag, flag}) {
+function LoginManager({ cambioDeFlag, flag }: { cambioDeFlag: (value: boolean) => void, flag: boolean }) {
 
     useEffect(() => {
         socket.on('connect', () => {
@@ -243,7 +260,7 @@ function LoginManager({ cambioDeFlag, flag}) {
         return () => {
             socket.disconnect();
         };
-    }, []);
+    },[]);
 
     const [rutUsuario, setRutUsuario] = useState('');
 
@@ -271,32 +288,44 @@ function LoginManager({ cambioDeFlag, flag}) {
 }
 
 
-export const FileUploadComponent = () => {
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
+export const FileUploadComponent: React.FC = () => {
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]; // Verifica si hay un archivo seleccionado
         if (file) {
             if (file.type === "text/csv") {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    const csvData = e.target.result;
-                    Papa.parse(csvData, {
+                reader.onload = (e: ProgressEvent<FileReader>) => {
+                    const csvData = e.target?.result as string; // Asegúrate de que el resultado sea una cadena
+                    Papa.parse<ReservaCSV>(csvData, {
                         header: true, // Si el archivo tiene encabezados
                         skipEmptyLines: true,
                         complete: (result) => {
-                            console.log("Datos del CSV:", result.data[1]["Categor�a"]);
+                            console.log("Datos del CSV:", result.data);
                             // Aquí puedes operar con los datos del CSV
                             result.data.forEach((fila) => {
-                                let reserva = {
+                                console.log('sucursalSalida', fila);
+                                 // Aqui el objeto fila tiene los campos en el formtato de la interfaz ReservaCSV
+                                 // Pero por algun motivo no se puede acceder a los campos de la interfaz con el nombre tal cual, tiene que ser con el nombre de la columna del csv
+
+                                 /**
+                                  deberia ser algo como esto:
+                                    const reserva: Reserva= {
+                                        hora: fila['sucursalSalida'],
+                                        patente: fila.[patente],
+                                        observaciones: [],
+                                        estado: 'Pendiente',
+                                  */
+                                const reserva: Reserva= {
                                     hora: fila["Suc. Salida"],
                                     patente: fila["Patente"],
-                                    obs: '',
-                                }
+                                    observaciones: [],
+                                    estado: 'Pendiente',
+                                };
                                 socket.emit('agregarReserva', reserva);
                                 console.log('reserva', reserva);
                             });
-
                         },
-                        error: (error) => {
+                        error: (error: Error) => {
                             console.error("Error al leer el archivo CSV:", error);
                         },
                     });

@@ -1,6 +1,8 @@
 /* EN ESTE ARCHIVO SE MANEJA LA LOGICA DE CONEXIONES UTILIZANDO EL SOCKET.
 EVENTOS DE CONEXION Y DESCONEXION VAN EN SERVER.JS*/
 
+import { Server, Socket } from "socket.io";
+
 // const listadoRuts = {
 //     '12345678-9': { nombre: 'Juan', rut: '12345678-9' },
 //     '98765432-1': { nombre: 'Maria', rut: '98765432-1' },
@@ -15,20 +17,24 @@ const listadoRuts = {
     '20479124-4': { nombre: 'Piero'},
 };
 
-const reservas = [];
+interface Observacion {
+    emisor: string;
+    mensaje: string;
+}
 
-const obs = {
-    emisor: '',
-    mensaje: '',
-};
+interface Reserva {
+    hora: string;
+    patente: string;
+    observaciones: Observacion[];
+    estado: string;
+}
 
-function manejoReservas(socket, io) {
-    socket.on('agregarReserva', (data) => {
-        //console.log('agregarAuto', data);
+const reservas: Reserva[] = [];
 
+function manejoReservas(socket: Socket, io: Server) {
+    socket.on('agregarReserva', (data : { hora: string; patente: string }) => {
 
-        
-        const nuevaReserva = {
+        const nuevaReserva: Reserva = {
             hora: data.hora,
             patente: data.patente,
             observaciones: [],
@@ -43,17 +49,16 @@ function manejoReservas(socket, io) {
         socket.emit('listaReservas', reservas);
     });
 
-    socket.on('editarEstadoReserva', (data) => {
-        //console.log('editarestadoReserva', data);
+    socket.on('editarEstadoReserva', (data: { index: number; estado: string }) => {
         const { index, estado } = data;
         if (reservas[index]) {
-            reservas[index].estado = estado;
-            io.emit('updateListaReservas', reservas);
+          reservas[index].estado = estado;
+          io.emit('updateListaReservas', reservas);
         }
-    });
+      });
 
-    socket.on('agregarObservacion', (data) => {
-        const observacion = {
+    socket.on('agregarObservacion', (data: { patente: string; emisor: string; mensaje: string }) => {
+        const nuevaObservacion: Observacion = {
             emisor: data.emisor,
             mensaje: data.mensaje,
         };
@@ -61,8 +66,8 @@ function manejoReservas(socket, io) {
         //const { patente, observacion } = data;
         const reserva = reservas.find((r) => r.patente === data.patente);
         if (reserva) {
-            reserva.obs.concat(observacion); // Agregar observación al array
-            io.emit('observacionAgregada', { patente, observacion }); // Notificar al cliente
+            reserva.observaciones.push(nuevaObservacion); // Agregar observación al array
+            io.emit('observacionAgregada', { patente: data.patente, nuevaObservacion}); // Notificar al cliente
         }
     });
 
@@ -76,4 +81,4 @@ function manejoReservas(socket, io) {
     // });
 }
 
-module.exports = manejoReservas;
+export default manejoReservas;
