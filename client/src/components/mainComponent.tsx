@@ -265,9 +265,13 @@ function LoginManager({ cambioDeFlag, flag }: { cambioDeFlag: (value: boolean) =
     const [rutUsuario, setRutUsuario] = useState('');
 
     const conectarSocket = () => {
+        if (listadoRuts[rutUsuario]) {
         socket.connect();
         socket.emit('ingreso', rutUsuario);
         window.localStorage.setItem('rutUsuario', rutUsuario);
+        }else {
+            alert('Rut no valido');
+        }
     }
     if (flag === false) {
         return (
