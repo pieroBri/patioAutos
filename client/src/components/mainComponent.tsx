@@ -10,8 +10,10 @@ import { ReservaCSV } from "../interfaces/archivos"
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dialog } from "primereact/dialog";
 
+import { modificarFormatoHora } from "../scripts/metodos";
 import Papa from "papaparse";
 import { ColorPicker } from "primereact/colorpicker";
+import { Divider } from "primereact/divider";
 
 interface Observacion {
     emisor: string;
@@ -100,6 +102,10 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
     
     const agregarObservación = (patente: string) => {
         console.log('agregarObservacion', patente, observacion);
+        if(!observacion){
+            alert("ingrese observación")
+            return
+        }; // Si no hay observacion no se agrega nada
         socket.emit('agregarObservacion', { patente: patente, emisor: rutUsuario, mensaje: observacion });
         setObservacion('');
         setVisible(false);
@@ -107,6 +113,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
     }
 
     const mostrarModal = (patente: string) => {
+        console.log('mostrarModal', patente);
         setModalVisible(patente);
         setVisible(true);
     }
@@ -116,35 +123,35 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
             if (listadoRuts[rutUsuario].cargo === '0') {
                 return (
                     <div>
-                        <h1>{rutUsuario} </h1>
+                        <h1>{listadoRuts[rutUsuario].nombre} </h1>
                         
                         {listaReservaDeAutos.map((auto, index) => (
-                            <div key={index} id={index.toString()} className="flex p-3 gap-2 border-1 border-round-xl border-white-alpha-20">
+                            <div key={index} id={index.toString()} className="flex p-3 gap-2 border-1 border-round-xl mb-3" style={{borderColor: "#ffdf00"}} >
                                 <p className="p-2">Hora: {auto.hora}</p>
                                 <p className="p-2">Patente: {auto.patente}</p>
                                 <p className="p-2">Observaciones: </p>
                                 <InputTextarea
-                                    style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#333333", fontSize: '16px'}}
+                                    style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#f8f32b", fontSize: '16px'}}
                                     className="p-inputtext-lg"
                                     placeholder='Observacion'
                                     value={auto.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
                                     readOnly cols={30}/>
                                 <div className="p-3 bg-yellow">
-                                <Button label="Login" icon="pi pi-user" style={{backgroundColor: "grey", borderColor:"grey"}} onClick={()=>mostrarModal(auto.patente)} />
+                                <Button label="Agregar observación" icon="pi pi-comments" className="" style={{ backgroundColor: "#222222", borderColor:"f8f32b", border:"2px solid #f8f32b", color: "#ffffff" }} onClick={()=>mostrarModal(auto.patente)} />
                                 <Dialog
-                                    visible={visible && modalVisible === auto.patente}
+                                    visible={visible && modalVisible === auto.patente} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
                                     modal
-                                    id={'Dialog-'+auto.patente}
                                     onHide={() => {if (!visible) return; setVisible(false); }}
                                     content={() => (
-                                        <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: "#111111", borderColor:"#111111" }}>
+                                        <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: "#111111", borderColor:"#f8f32b" }}>
                                             
-                                            <InputText defaultValue={''}  style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#222222" }} onChange={(e) => setObservacion(e.target.value)} className="mx-10"/>
-                                            <Button label="Agregar Observación" style={{ borderRadius: '12px', backgroundColor: "#0170c2", borderColor:"#0170c2" }} onClick={() => agregarObservación(auto.patente)} />
-                                            </div>
+                                            <InputText defaultValue={''} style={{ borderRadius: '12px', backgroundColor: "#131313", borderColor:"#f8f32b" }} onChange={(e) => setObservacion(e.target.value)} className="mx-10"/>
+                                            <Button label="Agregar Observación" style={{ borderRadius: '12px', backgroundColor: "#171717", borderColor:"#f8f32b", color:"#8a8a8a" }} onClick={() => agregarObservación(auto.patente)} />
+                                        </div>
                                     )}
                                 ></Dialog>
 
+                                    
 
                                     {/*<InputText
                                         className="p-inputtext-lg"
@@ -210,6 +217,9 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                             <div className="mt-4">
                             <DataTable
                                 value={listaReservaDeAutos}
+                                rowGroupMode="rowspan" 
+                                groupRowsBy="hora"
+                                sortField="hora"
                                 showGridlines
                                 stripedRows
                                 className="text-white"
@@ -244,7 +254,29 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                 }}
                                 />
                                 <Column
-                                field="obs"
+                                body={(rowData: Reserva) => (
+                                    <div>
+                                        <Button label="Observaciones" icon="pi pi-comments" 
+                                        style={{ backgroundColor: "#222222", borderColor:"f8f32b", border:"2px solid #f8f32b", color: "#ffffff" }} 
+                                        onClick={()=>mostrarModal('DialogInfo-'+rowData.patente)} />
+                                        <Dialog
+                                            visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
+                                            modal
+                                            onHide={() => {if (!visible) return; setVisible(false);}}
+                                            content={() => (
+                                                <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: "#111111", borderColor:"#f8f32b" }}>
+                                                    <InputTextarea
+                                                    autoResize
+                                                    style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#f8f32b", fontSize: '8px'}}
+                                                    className="p-inputtext-lg"
+                                                    value={rowData.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
+                                                    readOnly cols={30}/>
+                                                </div>
+                                                )}>
+                                        </Dialog>
+                                    </div>
+                                    
+                                )}
                                 header="Observacion"
                                 style={{
                                     borderRight: "1px solid rgba(255, 255, 255, 0.2)",
@@ -254,7 +286,9 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                     background: "rgba(0, 100, 200, 0.3)",
                                     color: "white",
                                 }}
-                                />
+                                >
+                                    
+                                </Column>
                                 <Column
                                 field="estado"
                                 header="Estado"
@@ -339,13 +373,14 @@ export const FileUploadComponent: React.FC = () => {
                 const reader = new FileReader();
                 reader.onload = (e: ProgressEvent<FileReader>) => {
                     const csvData = e.target?.result as string; // Asegúrate de que el resultado sea una cadena
-                    Papa.parse<ReservaCSV>(csvData, {
+                    console.log(csvData)
+                    Papa.parse(csvData, {
                         header: true, // Si el archivo tiene encabezados
                         skipEmptyLines: true,
-                        complete: (result) => {
+                        complete: (result:  Papa.ParseResult<any>) => {
                             console.log("Datos del CSV:", result.data);
                             // Aquí puedes operar con los datos del CSV
-                            result.data.forEach((fila) => {
+                            result.data.forEach((fila: any) => {
                                 console.log('sucursalSalida', fila);
                                  // Aqui el objeto fila tiene los campos en el formtato de la interfaz ReservaCSV
                                  // Pero por algun motivo no se puede acceder a los campos de la interfaz con el nombre tal cual, tiene que ser con el nombre de la columna del csv
@@ -358,8 +393,10 @@ export const FileUploadComponent: React.FC = () => {
                                         observaciones: [],
                                         estado: 'Pendiente',
                                   */
+                                const horaa: string = modificarFormatoHora(fila["Suc. Salida"]);
+                                console.log('hora', fila["Suc. Salida"]);
                                 const reserva: Reserva= {
-                                    hora: fila["Suc. Salida"],
+                                    hora: horaa,
                                     patente: fila["Patente"],
                                     observaciones: [],
                                     estado: 'Pendiente',
