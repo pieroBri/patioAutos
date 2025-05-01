@@ -126,30 +126,76 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                         <h1>{listadoRuts[rutUsuario].nombre} </h1>
                         
                         {listaReservaDeAutos.map((auto, index) => (
-                            <div key={index} id={index.toString()} className="flex p-3 gap-2 border-1 border-round-xl mb-3" style={{borderColor: "#ffdf00"}} >
+                            <div
+								key={index}
+								id={index.toString()}
+								className="flex p-3 gap-2 border-1 border-round-xl mb-3"
+								style={{borderColor: "#ffdf00"}}
+							>
                                 <p className="p-2">Hora: {auto.hora}</p>
                                 <p className="p-2">Patente: {auto.patente}</p>
                                 <p className="p-2">Observaciones: </p>
                                 <InputTextarea
-                                    style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#f8f32b", fontSize: '16px'}}
-                                    className="p-inputtext-lg"
+									className="p-inputtext-lg"
+                                    style={{
+										borderRadius: '12px',
+										backgroundColor: "#222222",
+										borderColor:"#f8f32b",
+										fontSize: '16px'
+									}}
                                     placeholder='Observacion'
                                     value={auto.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
-                                    readOnly cols={30}/>
+                                    readOnly cols={30}
+								/>
                                 <div className="p-3 bg-yellow">
-                                <Button label="Agregar observación" icon="pi pi-comments" className="" style={{ backgroundColor: "#222222", borderColor:"f8f32b", border:"2px solid #f8f32b", color: "#ffffff" }} onClick={()=>mostrarModal(auto.patente)} />
-                                <Dialog
-                                    visible={visible && modalVisible === auto.patente} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
-                                    modal
-                                    onHide={() => {if (!visible) return; setVisible(false); }}
-                                    content={() => (
-                                        <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: "#111111", borderColor:"#f8f32b" }}>
-                                            
-                                            <InputText defaultValue={''} style={{ borderRadius: '12px', backgroundColor: "#131313", borderColor:"#f8f32b" }} onChange={(e) => setObservacion(e.target.value)} className="mx-10"/>
-                                            <Button label="Agregar Observación" style={{ borderRadius: '12px', backgroundColor: "#171717", borderColor:"#f8f32b", color:"#8a8a8a" }} onClick={() => agregarObservación(auto.patente)} />
-                                        </div>
-                                    )}
-                                ></Dialog>
+                                	<Button 
+										label="Agregar observación"
+										icon="pi pi-comments"
+										className=""
+										style={{
+											backgroundColor: "#222222",
+											borderColor:"f8f32b",
+											border:"2px solid #f8f32b",
+											color: "#ffffff"
+										}}
+										onClick={()=>mostrarModal(auto.patente)}
+									/>
+									<Dialog
+										visible={visible && modalVisible === auto.patente} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
+										modal
+										onHide={() => {if (!visible) return; setVisible(false); }}
+										content={() => (
+											<div 
+												className="flex flex-column px-8 py-5 gap-4"
+												style={{
+													borderRadius: '12px',
+													backgroundColor: "#111111",
+													borderColor:"#f8f32b"
+												}}
+											>
+												
+												<InputText
+													defaultValue={''}
+													style={{
+														borderRadius: '12px',
+														backgroundColor: "#131313",
+														borderColor:"#f8f32b"
+													}}
+													onChange={(e) => setObservacion(e.target.value)}
+													className="mx-10"
+												/>
+												<Button
+													label="Agregar Observación"
+													style={{
+														borderRadius: '12px',
+														backgroundColor: "#171717",
+														borderColor:"#f8f32b", color:"#8a8a8a"
+													}}
+													onClick={() => agregarObservación(auto.patente)}
+												/>
+											</div>
+										)} //cierre del content
+									></Dialog>
 
                                     
 
@@ -166,7 +212,8 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                 <select 
                                     name="estado" 
                                     defaultValue={auto.estado || "Pendiente"} 
-                                    onChange={editarEstado} className="border-1 border-blue-400 px-2"
+                                    onChange={editarEstado}
+									className="border-1 border-blue-400 px-2"
                                 >
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="En preparación">En preparación</option>
@@ -191,16 +238,17 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                 <span className="p-input-icon-left w-full md:w-4">
                                     <i className="pi pi-clock px-1" />
                                     <InputText
-                                    id="hora"
-                                    placeholder="Hora"
-                                    className="w-full p-inputtext-sm surface-900 text-white border-1 border-blue-400 px-4"/>
+										id="hora"
+										placeholder="Hora"
+										className="w-full p-inputtext-sm surface-900 text-white border-1 border-blue-400 px-4"
+									/>
                                 </span>
                                 <span className="p-input-icon-left w-full md:w-4">
                                     <i className="pi pi-id-card px-1" />
                                     <InputText
-                                    id="patente"
-                                    placeholder="Patente"
-                                    className="w-full p-inputtext-sm surface-900 text-white border-1 border-blue-400 px-4"
+										id="patente"
+										placeholder="Patente"
+										className="w-full p-inputtext-sm surface-900 text-white border-1 border-blue-400 px-4"
                                     />
                                 </span>
                                 <Button
@@ -215,102 +263,126 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 
                             {/* Table Section */}
                             <div className="mt-4">
-                            <DataTable
-                                value={listaReservaDeAutos}
-                                rowGroupMode="rowspan" 
-                                groupRowsBy="hora"
-                                sortField="hora"
-                                showGridlines
-                                stripedRows
-                                className="text-white"
-                                style={{
-                                background: "rgba(30, 30, 30, 0.7)",
-                                borderRadius: "8px",
-                                border: "1px solid rgba(255, 255, 255, 0.2)",
-                                }}
-                            >
-                                <Column
-                                field="hora"
-                                header="Hora"
-                                style={{
-                                    borderRight: "1px solid rgba(255, 255, 255, 0.2)",
-                                    background: "rgba(20, 20, 20, 0.7)",
-                                }}
-                                headerStyle={{
-                                    background: "rgba(0, 100, 200, 0.3)",
-                                    color: "white",
-                                }}
-                                />
-                                <Column
-                                field="patente"
-                                header="Patente"
-                                style={{
-                                    borderRight: "1px solid rgba(255, 255, 255, 0.2)",
-                                    background: "rgba(20, 20, 20, 0.7)",
-                                }}
-                                headerStyle={{
-                                    background: "rgba(0, 100, 200, 0.3)",
-                                    color: "white",
-                                }}
-                                />
-                                <Column
-                                body={(rowData: Reserva) => (
-                                    <div>
-                                        <Button label="Observaciones" icon="pi pi-comments" 
-                                        style={{ backgroundColor: "#222222", borderColor:"f8f32b", border:"2px solid #f8f32b", color: "#ffffff" }} 
-                                        onClick={()=>mostrarModal('DialogInfo-'+rowData.patente)} />
-                                        <Dialog
-                                            visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
-                                            modal
-                                            onHide={() => {if (!visible) return; setVisible(false);}}
-                                            content={() => (
-                                                <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: "#111111", borderColor:"#f8f32b" }}>
-                                                    <InputTextarea
-                                                    autoResize
-                                                    style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#f8f32b", fontSize: '8px'}}
-                                                    className="p-inputtext-lg"
-                                                    value={rowData.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
-                                                    readOnly cols={30}/>
-                                                </div>
-                                                )}>
-                                        </Dialog>
-                                    </div>
-                                    
-                                )}
-                                header="Observacion"
-                                style={{
-                                    borderRight: "1px solid rgba(255, 255, 255, 0.2)",
-                                    background: "rgba(20, 20, 20, 0.7)",
-                                }}
-                                headerStyle={{
-                                    background: "rgba(0, 100, 200, 0.3)",
-                                    color: "white",
-                                }}
-                                >
-                                    
-                                </Column>
-                                <Column
-                                field="estado"
-                                header="Estado"
-                                style={{
-                                    background: "rgba(20, 20, 20, 0.7)",
-                                }}
-                                headerStyle={{
-                                    background: "rgba(0, 100, 200, 0.3)",
-                                    color: "white",
-                                }}
-                                />
-                            </DataTable>
-                                {/* {listaAutos.map((auto, index) => (
-                                    <div key={index}>
-                                        <p>Hora: {auto.hora}</p>
-                                        <p>Patente: {auto.patente}</p>
-                                        <p>Observación: {auto.obs}</p>
-                                    </div>
-                                ))} */}
+								<DataTable
+									value={listaReservaDeAutos}
+									rowGroupMode="rowspan" 
+									groupRowsBy="hora"
+									sortField="hora"
+									showGridlines
+									stripedRows
+									className="text-white"
+									style={{
+										background: "rgba(30, 30, 30, 0.7)",
+										borderRadius: "8px",
+										border: "1px solid rgba(255, 255, 255, 0.2)",
+									}}
+								>
+									<Column
+										field="hora"
+										header="Hora"
+										style={{
+											borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+											background: "rgba(20, 20, 20, 0.7)",
+										}}
+										headerStyle={{
+											background: "rgba(0, 100, 200, 0.3)",
+											color: "white",
+										}}
+									>
+									</Column>
+
+									<Column
+										field="patente"
+										header="Patente"
+										style={{
+											borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+											background: "rgba(20, 20, 20, 0.7)",
+										}}
+										headerStyle={{
+											background: "rgba(0, 100, 200, 0.3)",
+											color: "white",
+										}}
+									>
+									</Column>
+
+									<Column
+										body={(rowData: Reserva) => (
+											<div>
+												<Button
+													label="Observaciones"
+													icon="pi pi-comments" 
+													style={{
+														backgroundColor: "#222222",
+														borderColor:"f8f32b",
+														border:"2px solid #f8f32b",
+														color: "#ffffff"
+													}} 
+													onClick={()=>mostrarModal('DialogInfo-'+rowData.patente)}
+												/>
+												<Dialog
+													visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
+													modal
+													onHide={() => {if (!visible) return; setVisible(false);}}
+													content={() => (
+														<div 
+															className="flex flex-column px-8 py-5 gap-4"
+															style={{
+																borderRadius: '12px',
+																backgroundColor: "#111111",
+																borderColor:"#f8f32b" }}
+														>
+															<InputTextarea
+																autoResize
+																style={{ 
+																	borderRadius: '12px',
+																	backgroundColor: "#222222",
+																	borderColor:"#f8f32b",
+																	fontSize: '8px'}}
+																className="p-inputtext-lg"
+																value={rowData.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
+																readOnly cols={30}
+															/>
+														</div>
+														)}
+												>
+												</Dialog>
+											</div>
+										)}
+										header="Observacion"
+										style={{
+											borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+											background: "rgba(20, 20, 20, 0.7)",
+										}}
+										headerStyle={{
+											background: "rgba(0, 100, 200, 0.3)",
+											color: "white",
+										}}
+									>
+									</Column>
+
+									<Column
+										field="estado"
+										header="Estado"
+										style={{
+											background: "rgba(20, 20, 20, 0.7)",
+										}}
+										headerStyle={{
+											background: "rgba(0, 100, 200, 0.3)",
+											color: "white",
+										}}
+									>
+									</Column>
+								</DataTable>
+									{/* {listaAutos.map((auto, index) => (
+										<div key={index}>
+											<p>Hora: {auto.hora}</p>
+											<p>Patente: {auto.patente}</p>
+											<p>Observación: {auto.obs}</p>
+										</div>
+									))} */}
                             </div>
+							{/* Cierre del div de la tabla */}
                         </Card>
-                        
                     </div>
                 );
             }
@@ -339,9 +411,9 @@ function LoginManager({ cambioDeFlag, flag }: { cambioDeFlag: (value: boolean) =
 
     const conectarSocket = () => {
         if (listadoRuts[rutUsuario]) {
-        socket.connect();
-        socket.emit('ingreso', rutUsuario);
-        window.localStorage.setItem('rutUsuario', rutUsuario);
+			socket.connect();
+			socket.emit('ingreso', rutUsuario);
+			window.localStorage.setItem('rutUsuario', rutUsuario);
         }else {
             alert('Rut no valido');
         }
@@ -357,7 +429,12 @@ function LoginManager({ cambioDeFlag, flag }: { cambioDeFlag: (value: boolean) =
                         value={rutUsuario}
                         onChange={(e) => setRutUsuario(e.target.value)}
                         />
-                    <Button label="Enter" className="p-button-primary p-button-lg" onClick={conectarSocket}></Button>
+                    <Button 
+						label="Enter"
+						className="p-button-primary p-button-lg"
+						onClick={conectarSocket}
+					>
+					</Button>
                 </div>
             </div>
         );
