@@ -11,6 +11,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Dialog } from "primereact/dialog";
 
 import Papa from "papaparse";
+import { ColorPicker } from "primereact/colorpicker";
 
 interface Observacion {
     emisor: string;
@@ -123,22 +124,23 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                 <p className="p-2">Patente: {auto.patente}</p>
                                 <p className="p-2">Observaciones: </p>
                                 <InputTextarea
+                                    style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#333333", fontSize: '16px'}}
                                     className="p-inputtext-lg"
                                     placeholder='Observacion'
                                     value={auto.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
                                     readOnly cols={30}/>
                                 <div className="p-3 bg-yellow">
-                                <Button label="Login" icon="pi pi-user"  onClick={()=>mostrarModal(auto.patente)} />
+                                <Button label="Login" icon="pi pi-user" style={{backgroundColor: "grey", borderColor:"grey"}} onClick={()=>mostrarModal(auto.patente)} />
                                 <Dialog
                                     visible={visible && modalVisible === auto.patente}
                                     modal
                                     id={'Dialog-'+auto.patente}
                                     onHide={() => {if (!visible) return; setVisible(false); }}
                                     content={() => (
-                                        <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundImage: 'radial-gradient(circle at left top, var(--primary-400), var(--primary-700))' }}>
+                                        <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: "#111111", borderColor:"#111111" }}>
                                             
-                                            <InputText defaultValue={''}  onChange={(e) => setObservacion(e.target.value)} className="mx-10"/>
-                                            <Button label="Agregar Observación" onClick={() => agregarObservación(auto.patente)} />
+                                            <InputText defaultValue={''}  style={{ borderRadius: '12px', backgroundColor: "#222222", borderColor:"#222222" }} onChange={(e) => setObservacion(e.target.value)} className="mx-10"/>
+                                            <Button label="Agregar Observación" style={{ borderRadius: '12px', backgroundColor: "#0170c2", borderColor:"#0170c2" }} onClick={() => agregarObservación(auto.patente)} />
                                             </div>
                                     )}
                                 ></Dialog>
