@@ -8,6 +8,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ReservaCSV } from "../interfaces/archivos"
 import { InputTextarea } from "primereact/inputtextarea";
+import { Dialog } from "primereact/dialog";
 
 import Papa from "papaparse";
 
@@ -35,6 +36,8 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
     const rutUsuario = window.localStorage.getItem('rutUsuario') ?? '';
     const [observacion, setObservacion] = useState<string>(''); // Estado para la observación
     const [listaReservaDeAutos, setListaReservaDeAutos] = useState<Reserva[]>([]); // Estado para la lista de reservas con interfaz
+    const [visible, setVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState('');
 
     useEffect(() => {
         if (flag) {
@@ -98,6 +101,13 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
         console.log('agregarObservacion', patente, observacion);
         socket.emit('agregarObservacion', { patente: patente, emisor: rutUsuario, mensaje: observacion });
         setObservacion('');
+        setVisible(false);
+        setModalVisible('');
+    }
+
+    const mostrarModal = (patente: string) => {
+        setModalVisible(patente);
+        setVisible(true);
     }
 
     if (flag) {
@@ -116,16 +126,32 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                     className="p-inputtext-lg"
                                     placeholder='Observacion'
                                     value={auto.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
-                                    readOnly rows={5} cols={30}/>
+                                    readOnly cols={30}/>
                                 <div className="p-3 bg-yellow">
-                                    <InputText
+                                <Button label="Login" icon="pi pi-user"  onClick={()=>mostrarModal(auto.patente)} />
+                                <Dialog
+                                    visible={visible && modalVisible === auto.patente}
+                                    modal
+                                    id={'Dialog-'+auto.patente}
+                                    onHide={() => {if (!visible) return; setVisible(false); }}
+                                    content={() => (
+                                        <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundImage: 'radial-gradient(circle at left top, var(--primary-400), var(--primary-700))' }}>
+                                            
+                                            <InputText defaultValue={''}  onChange={(e) => setObservacion(e.target.value)} className="mx-10"/>
+                                            <Button label="Agregar Observación" onClick={() => agregarObservación(auto.patente)} />
+                                            </div>
+                                    )}
+                                ></Dialog>
+
+
+                                    {/*<InputText
                                         className="p-inputtext-lg"
                                         type="text"
                                         placeholder='Observacion'
                                         defaultValue=''
                                         onChange={(e) => setObservacion(e.target.value)}
                                     />
-                                    <Button label="submit" className="p-button-warning p-button-lg" onClick={() => agregarObservación(auto.patente)}></Button>
+                                    <Button label="submit" className="p-button-warning p-button-lg" onClick={() => agregarObservación(auto.patente)}></Button>*/}
                                 </div>
                                 {/* <p className="p-2">Observación: <InputText value={auto.obs} onChange={editarObservación} /></p> */}
                                 <select 
