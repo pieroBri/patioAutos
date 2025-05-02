@@ -145,7 +145,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 										fontSize: '16px'
 									}}
                                     placeholder='Observacion'
-                                    value={auto.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
+                                    value={auto.observaciones.map((obs) => `${listadoRuts[obs.emisor].nombre}: ${obs.mensaje}`).join('\n')}
                                     readOnly cols={30}
 								/>
                                 <div className="p-3 bg-yellow">
@@ -164,39 +164,41 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 									<Dialog
 										visible={modalVisible === auto.patente} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
 										modal
+                                        dismissableMask
+                                        draggable={false}
+                                        header="Agregar Observación"
 										onHide={() => {if (modalVisible != auto.patente) return; setModalVisible(''); }}
-										content={() => (
-											<div 
-												className="flex flex-column px-8 py-5 gap-4"
-												style={{
-													borderRadius: '12px',
-													backgroundColor: "#111111",
-													borderColor:"#f8f32b"
-												}}
-											>
-												
-												<InputText
-													defaultValue={''}
-													style={{
-														borderRadius: '12px',
-														backgroundColor: "#131313",
-														borderColor:"#f8f32b"
-													}}
-													onChange={(e) => setObservacion(e.target.value)}
-													className="mx-10"
-												/>
-												<Button
-													label="Agregar Observación"
-													style={{
-														borderRadius: '12px',
-														backgroundColor: "#171717",
-														borderColor:"#f8f32b", color:"#8a8a8a"
-													}}
-													onClick={() => agregarObservación(auto.patente)}
-												/>
-											</div>
-										)} //cierre del content
-									></Dialog>
+									>
+                                        <div 
+                                            className="flex flex-column px-8 py-5 gap-4"
+                                            style={{
+                                                borderRadius: '12px',
+                                                backgroundColor: "#111111",
+                                                borderColor:"#f8f32b"
+                                            }}
+                                        >
+                                        
+                                            <InputText
+                                                defaultValue={''}
+                                                style={{
+                                                    borderRadius: '12px',
+                                                    backgroundColor: "#131313",
+                                                    borderColor:"#f8f32b"
+                                                }}
+                                                onChange={(e) => setObservacion(e.target.value)}
+                                                className="mx-10"
+                                            />
+                                            <Button
+                                                label="Enviar"
+                                                style={{
+                                                    borderRadius: '12px',
+                                                    backgroundColor: "#171717",
+                                                    borderColor:"#f8f32b", color:"#8a8a8a"
+                                                }}
+                                                onClick={() => agregarObservación(auto.patente)}
+                                            />
+                                        </div>
+                                    </Dialog>
 
                                     
 
@@ -338,7 +340,9 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 									</Column>
 								</DataTable>
                                 <Dialog
-                                    closable={true}
+                                    header="Observaciones"
+                                    dismissableMask
+                                    draggable={false}
                                     visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
                                     onHide={() => {if (!visible) return; setVisible(false);}}
 
@@ -363,7 +367,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                             width: '50vw'
                                         }}
                                         className="p-inputtext-lg"
-                                        value={arrayObservaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
+                                        value={arrayObservaciones.map((obs) => `${listadoRuts[obs.emisor].nombre}: ${obs.mensaje}`).join('\n')}
                                         readOnly cols={30}
                                     />
                                         ) : (
