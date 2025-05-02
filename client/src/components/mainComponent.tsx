@@ -10,10 +10,12 @@ import { ReservaCSV } from "../interfaces/archivos"
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dialog } from "primereact/dialog";
 
-import { modificarFormatoHora } from "../scripts/metodos";
+import { modificarFormatoHora, validarFormatoPatente } from "../scripts/metodos";
 import Papa from "papaparse";
 import { ColorPicker } from "primereact/colorpicker";
 import { Divider } from "primereact/divider";
+import { validarFormatoHora } from "../scripts/metodos";
+
 
 interface Observacion {
     emisor: string;
@@ -77,8 +79,17 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
     function agregarAuto() {
         console.log('agregarAuto');
         const hora = (document.getElementById("hora") as HTMLInputElement).value;
-        const patente = (document.getElementById("patente") as HTMLInputElement).value;
+        const patente = (document.getElementById("patente") as HTMLInputElement).value.toLocaleUpperCase();
 
+        if(!validarFormatoHora(hora)){
+            alert("Formato de hora incorrecto")
+            return
+        }
+
+        if(!validarFormatoPatente(patente)){
+            alert("Formato de patente incorrecto")
+            return
+        }
         console.log('hora', hora);
         console.log('patente', patente);
 
@@ -221,6 +232,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="En preparación">En preparación</option>
                                     <option value="Disponible">Disponible</option>
+                                    <option value="Entregado">Entregado</option>
                                 </select>
                             </div>
                         ))}
