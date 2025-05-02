@@ -41,6 +41,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
     const [listaReservaDeAutos, setListaReservaDeAutos] = useState<Reserva[]>([]); // Estado para la lista de reservas con interfaz
     const [visible, setVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState('');
+    const [arrayObservaciones, setArrayObservaciones] = useState<Observacion[]>([]); // Estado para las observaciones
 
     useEffect(() => {
         if (flag) {
@@ -112,8 +113,8 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
         setModalVisible('');
     }
 
-    const mostrarModal = (patente: string) => {
-        console.log('mostrarModal', patente);
+    const mostrarModal = (patente: string, data: Observacion[]) => {
+        setArrayObservaciones(data);
         setModalVisible(patente);
         setVisible(true);
     }
@@ -158,12 +159,12 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 											border:"2px solid #f8f32b",
 											color: "#ffffff"
 										}}
-										onClick={()=>mostrarModal(auto.patente)}
+										onClick={()=>setModalVisible(auto.patente)}
 									/>
 									<Dialog
-										visible={visible && modalVisible === auto.patente} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
+										visible={modalVisible === auto.patente} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
 										modal
-										onHide={() => {if (!visible) return; setVisible(false); }}
+										onHide={() => {if (modalVisible != auto.patente) return; setModalVisible(''); }}
 										content={() => (
 											<div 
 												className="flex flex-column px-8 py-5 gap-4"
@@ -308,44 +309,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 									<Column
 										body={(rowData: Reserva) => (
 											<div>
-												<Button
-													label="Observaciones"
-													icon="pi pi-comments" 
-													style={{
-														backgroundColor: "#222222",
-														borderColor:"f8f32b",
-														border:"2px solid #f8f32b",
-														color: "#ffffff"
-													}} 
-													onClick={()=>mostrarModal('DialogInfo-'+rowData.patente)}
-												/>
-												<Dialog
-													visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
-													modal
-													onHide={() => {if (!visible) return; setVisible(false);}}
-													content={() => (
-														<div 
-															className="flex flex-column px-8 py-5 gap-4"
-															style={{
-																borderRadius: '12px',
-																backgroundColor: "#111111",
-																borderColor:"#f8f32b" }}
-														>
-															<InputTextarea
-																autoResize
-																style={{ 
-																	borderRadius: '12px',
-																	backgroundColor: "#222222",
-																	borderColor:"#f8f32b",
-																	fontSize: '8px'}}
-																className="p-inputtext-lg"
-																value={rowData.observaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
-																readOnly cols={30}
-															/>
-														</div>
-														)}
-												>
-												</Dialog>
+												<Button label="Show" icon="pi pi-external-link" onClick={()=>mostrarModal(rowData.patente, rowData.observaciones)} />
 											</div>
 										)}
 										header="Observacion"
@@ -373,13 +337,42 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 									>
 									</Column>
 								</DataTable>
-									{/* {listaAutos.map((auto, index) => (
-										<div key={index}>
-											<p>Hora: {auto.hora}</p>
-											<p>Patente: {auto.patente}</p>
-											<p>Observación: {auto.obs}</p>
-										</div>
-									))} */}
+                                <Dialog
+                                    closable={true}
+                                    visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
+                                    onHide={() => {if (!visible) return; setVisible(false);}}
+
+                                >
+                                <div 
+                                    className="flex flex-column px-8 py-5 gap-4"
+                                    style={{ 
+                                        borderRadius: '12px',
+                                        backgroundColor: "#111111", 
+                                        borderColor:"#f8f32b" 
+                                    }
+                                }>
+                                    {
+                                        arrayObservaciones.length > 0 ? (
+                                            <InputTextarea
+                                        autoResize
+                                        style={{ 
+                                            borderRadius: '12px', 
+                                            backgroundColor: "#222222", 
+                                            borderColor:"#f8f32b", 
+                                            fontSize: '18px', 
+                                            width: '50vw'
+                                        }}
+                                        className="p-inputtext-lg"
+                                        value={arrayObservaciones.map((obs) => `${obs.emisor}: ${obs.mensaje}`).join('\n')}
+                                        readOnly cols={30}
+                                    />
+                                        ) : (
+                                            <p className="text-white">No hay observaciones</p>
+                                        )
+                                    }
+                                    
+                                </div>
+                                </Dialog>
                             </div>
 							{/* Cierre del div de la tabla */}
                         </Card>
