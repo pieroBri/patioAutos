@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import { io } from "socket.io-client";
-import { Button } from 'primereact/button';
+import { Button } from 'primereact/Button';
 import { InputText } from "primereact/inputtext";
-import { Card } from "primereact/card";
+import { Card } from "primereact/Card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import Papa from "papaparse";
@@ -213,7 +213,6 @@ function LoginManager({ cambioDeFlag, flag}) {
         return () => {
             socket.disconnect();
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const [rutUsuario, setRutUsuario] = useState('');
