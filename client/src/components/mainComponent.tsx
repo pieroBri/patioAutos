@@ -29,7 +29,7 @@ interface Reserva {
     estado: string;
 }
 
-const socket = io('http://localhost:4000', {autoConnect: false});
+const socket = io('https://patioautos-server.onrender.com', {autoConnect: false});
 
 const listadoRuts: Record<string, { nombre: string; cargo: string }> = {
     '20251778-1': { nombre: 'Seba', cargo: '0' },
