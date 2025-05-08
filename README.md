@@ -11,7 +11,7 @@ Para comenzar debes realizar los siguiente:
   * `npm i`
 
 **En la terminal del server**
-`npm run start`
+`npm run dev`
 
 **En la terninal del cliente**
 `npm run dev`
