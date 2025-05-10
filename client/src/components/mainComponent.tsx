@@ -15,6 +15,7 @@ import Papa from "papaparse";
 import { ColorPicker } from "primereact/colorpicker";
 import { Divider } from "primereact/divider";
 import { validarFormatoHora } from "../scripts/metodos";
+import { Dropdown } from "primereact/dropdown";
 
 
 interface Observacion {
@@ -36,6 +37,8 @@ const listadoRuts: Record<string, { nombre: string; cargo: string }> = {
     '20479124-4': { nombre: 'Piero', cargo: '1' },
     '12345678-9': { nombre: 'Juan', cargo: '1' },
 };
+
+const opciones = ['Pendiente', 'En preparación', 'Entregado', 'Disponible'];
 
 export const AdminComponent = ({ flag }: { flag: boolean }) => {
     const rutUsuario = window.localStorage.getItem('rutUsuario') ?? '';
@@ -102,8 +105,9 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
 
     }
 
-    const editarEstado = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const id_auto = e.target.parentElement?.id || ""; 
+    const editarEstado = (e: any) => {
+        console.log(e.target)
+        const id_auto = e.target.parentElement?.id||e.target.name; 
         const estado = e.target.value;
 
         console.log('id', id_auto);
@@ -141,33 +145,41 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                             <div
 								key={index}
 								id={index.toString()}
-								className="flex p-3 gap-2 border-1 border-round-xl mb-3"
-								style={{borderColor: "#ffdf00"}}
+								className="flex p-2 gap-2 border-1 border-round-xl mb-3 justify-content-between align-items-center"
+                                style={{
+                                        borderRadius: '12px',
+                                        borderColor:"var(--yellow-400)",
+                                        fontSize: '20px',
+                                    }}
 							>
-                                <p className="p-2">Hora: {auto.hora}</p>
-                                <p className="p-2">Patente: {auto.patente}</p>
-                                <p className="p-2">Observaciones: </p>
-                                <InputTextarea
-									className="p-inputtext-lg"
-                                    style={{
-										borderRadius: '12px',
-										backgroundColor: "#222222",
-										borderColor:"#f8f32b",
-										fontSize: '16px'
-									}}
-                                    placeholder='Observacion'
-                                    value={auto.observaciones.map((obs) => `${listadoRuts[obs.emisor].nombre}: ${obs.mensaje}`).join('\n')}
-                                    readOnly cols={30}
-								/>
-                                <div className="p-3 bg-yellow">
+                                <p className="px-2">Hora: {auto.hora}</p>
+                                <p className="px-2">Patente: {auto.patente}</p>
+                                <div style={{ fontSize: '16px' }} className="py-1">
+                                    <p>Observaciones: </p>
+                                    <InputTextarea
+                                        className="p-inputtext-lg"
+                                        style={{
+                                            borderRadius: '12px',
+                                            backgroundColor: "var(--bluegray-900)",
+                                            borderColor: "var(--yellow-400)",
+                                            fontSize: '16px',
+                                            color: "#ffffff",
+                                        }}
+                                        placeholder='No hay observaciones'
+                                        value={auto.observaciones.map((obs) => `${listadoRuts[obs.emisor].nombre.toUpperCase()}: ${obs.mensaje}`).join('\n')}
+                                        readOnly cols={30}
+                                    />
+                                </div>
+                                
+                                <div className="">
                                 	<Button 
 										label="Agregar observación"
 										icon="pi pi-comments"
-										className=""
+										className="p-4"
 										style={{
-											backgroundColor: "#222222",
-											borderColor:"f8f32b",
-											border:"2px solid #f8f32b",
+											borderRadius: '12px',
+                                            backgroundColor: "var(--bluegray-900)",
+                                            borderColor:"var(--yellow-400)",
 											color: "#ffffff"
 										}}
 										onClick={()=>setModalVisible(auto.patente)}
@@ -184,8 +196,9 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                             className="flex flex-column px-8 py-5 gap-4"
                                             style={{
                                                 borderRadius: '12px',
-                                                backgroundColor: "#111111",
-                                                borderColor:"#f8f32b"
+                                                backgroundColor: "1f2d40",
+                                                borderColor:"var(--yellow-400)",
+                                                color: "#ffffff",
                                             }}
                                         >
                                         
@@ -193,8 +206,9 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                                 defaultValue={''}
                                                 style={{
                                                     borderRadius: '12px',
-                                                    backgroundColor: "#131313",
-                                                    borderColor:"#f8f32b"
+                                                    backgroundColor: "var(--bluegray-900)",
+                                                    borderColor:"var(--yellow-400)",
+                                                    fontSize: '18px',
                                                 }}
                                                 onChange={(e) => setObservacion(e.target.value)}
                                                 className="mx-10"
@@ -203,9 +217,11 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                                 label="Enviar"
                                                 style={{
                                                     borderRadius: '12px',
-                                                    backgroundColor: "#171717",
-                                                    borderColor:"#f8f32b", color:"#8a8a8a"
+                                                    backgroundColor: "var(--bluegray-900)",
+                                                    borderColor:"var(--yellow-400)", 
+                                                    color:"#ffffff"
                                                 }}
+                                                
                                                 onClick={() => agregarObservación(auto.patente)}
                                             />
                                         </div>
@@ -223,17 +239,25 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                     <Button label="submit" className="p-button-warning p-button-lg" onClick={() => agregarObservación(auto.patente)}></Button>*/}
                                 </div>
                                 {/* <p className="p-2">Observación: <InputText value={auto.obs} onChange={editarObservación} /></p> */}
-                                <select 
-                                    name="estado" 
-                                    defaultValue={auto.estado || "Pendiente"} 
-                                    onChange={editarEstado}
-									className="border-1 border-blue-400 px-2"
-                                >
-                                    <option value="Pendiente">Pendiente</option>
-                                    <option value="En preparación">En preparación</option>
-                                    <option value="Disponible">Disponible</option>
-                                    <option value="Entregado">Entregado</option>
-                                </select>
+                                <div className="pr-2">
+                                    <Dropdown   
+                                        style={{
+                                                borderRadius: '12px',
+                                                backgroundColor: "var(--bluegray-900)",
+                                                borderColor:"var(--yellow-400)",
+                                            }}
+                                        
+                                        value={auto.estado} 
+                                        onChange={(e) => editarEstado(e)} 
+                                        options={opciones} 
+                                        name={index.toString()}
+                                        optionLabel="name"  
+                                        placeholder="Estado" 
+                                        className="w-full md:w-14rem py-3 px-2" 
+                                    />        
+                                </div>
+                                
+                                
                             </div>
                         ))}
                     </div>
@@ -271,7 +295,7 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                     icon="pi pi-plus"
                                     onClick={agregarAuto}
                                     className="p-button-sm w-full md:w-2 border-1 border-yellow-400"
-                                    style={{ background: "rgba(204, 204, 44)" }}
+                                    style={{ backgroundColor: "var(--yellow-400)",}}
                                 />
                                 <FileUploadComponent />
                             </div>
@@ -358,35 +382,34 @@ export const AdminComponent = ({ flag }: { flag: boolean }) => {
                                     visible={visible} // valida que el modal sea visible y que el id del auto sea el mismo que el del modal
                                     onHide={() => {if (!visible) return; setVisible(false);}}
                                 >
-                                <div 
+                                    <div 
                                     className="flex flex-column px-8 py-5 gap-4"
-                                    style={{ 
-                                        borderRadius: '12px',
-                                        backgroundColor: "#111111", 
-                                        borderColor:"#f8f32b" 
-                                    }}
-                                >
+                                    style={{
+                                            borderRadius: '12px',
+                                            backgroundColor: "1f2d40",
+                                            borderColor:"var(--yellow-400)",
+                                            color: "#ffffff",
+                                        }}
+                                    >
                                 
-                                {
-                                    arrayObservaciones.length > 0 ? (
-                                        <InputTextarea
-                                            autoResize
-                                            style={{ 
-                                                borderRadius: '12px', 
-                                                backgroundColor: "#222222", 
-                                                borderColor:"#f8f32b", 
-                                                fontSize: '18px', 
-                                                width: '50vw'
-                                            }}
-                                            className="p-inputtext-lg"
-                                            value={arrayObservaciones.map((obs) => `${listadoRuts[obs.emisor].nombre}: ${obs.mensaje}`).join('\n')}
-                                            readOnly cols={30}
-                                        />
-                                    ) : (
-                                        <p className="text-white">No hay observaciones</p>
-                                    )
-                                }
-                                </div>
+                                    {
+                                        arrayObservaciones.length > 0 ? (
+                                            <InputTextarea
+                                                autoResize
+                                                style={{
+                                                    
+                                                    backgroundColor: "var(--bluegray-900)",
+                                                    fontSize: '18px',
+                                                }}
+                                                className="p-inputtext-lg"
+                                                value={arrayObservaciones.map((obs) => `${listadoRuts[obs.emisor].nombre}: ${obs.mensaje}`).join('\n')}
+                                                readOnly cols={30}
+                                            />
+                                        ) : (
+                                            <p className="text-white">No hay observaciones</p>
+                                        )
+                                    }
+                                    </div>
                                 </Dialog>
                             </div>
 							{/* Cierre del div de la tabla */}
